@@ -127,6 +127,131 @@ let slice = &arr[1..4]; // This creates a slice of the array from index 1 to ind
 println!("{:?}", slice); // Prints "[2, 3, 4]"
 let str_slice = &"Hello, world!"[0..5]; // This creates a slice of the string from index 0 to index 4
 println!("{}", str_slice); // Prints "Hello"
+
+let arr2 = [10, 20, 30, 40, 50];
+let slice2 = &mut arr2[2..]; // This creates a mutable slice of the array from index 2 to the end
+slice2[0] = 100; // Modify the first element of the slice
+println!("{:?}", slice2); // Prints "[100, 40, 50]"
 ```
 
 ## Traits
+Traits in Rust are a way to define shared behavior that can be implemented by different types. They are similar to interfaces in other languages. A trait defines a set of methods that a type must implement to conform to the trait. Traits allow for polymorphism, enabling you to write generic code that can work with any type that implements a specific trait.
+```rust
+trait Speak {
+    fn speak(&self);
+}
+struct Dog;
+impl Speak for Dog {
+    fn speak(&self) {
+        println!("Woof!");
+    }
+}
+struct Cat;
+impl Speak for Cat {
+    fn speak(&self) {
+        println!("Meow!");
+    }
+}
+fn make_speak<T: Speak>(animal: T) {
+    animal.speak();
+}
+let dog = Dog;
+let cat = Cat;
+make_speak(dog); // Prints "Woof!"
+make_speak(cat); // Prints "Meow!"
+```
+
+## Option<T> and Result<T, E>
+The `Option<T>` and `Result<T, E>` types are used for error handling in Rust. They provide a way to handle cases where a value may be absent or an operation may fail.
+
+- **Option<T>:** Represents an optional value that can be either `Some(value)` or `None`. It is used to handle cases where a value may not be present.
+```rust
+let some_value: Option<i32> = Some(10);
+let no_value: Option<i32> = None;
+match some_value {
+    Some(v) => println!("Value is: {}", v),
+    None => println!("No value present"),
+}
+match no_value {
+    Some(v) => println!("Value is: {}", v),
+    None => println!("No value present"),
+}
+```
+
+- **Result<T, E>:** Represents a value that can be either `Ok(value)` or `Err(error)`. It is used for error handling in functions that can fail.
+```rust
+fn divide(a: i32, b: i32) -> Result<i32, String> {
+    if b == 0 {
+        Err(String::from("Cannot divide by zero"))
+    } else {
+        Ok(a / b)
+    }
+}
+let result = divide(10, 2);
+match result {
+    Ok(value) => println!("Result is: {}", value),
+    Err(e) => println!("Error: {}", e),
+}
+let error_result = divide(10, 0);
+match error_result {
+    Ok(value) => println!("Result is: {}", value),
+    Err(e) => println!("Error: {}", e),
+}
+```
+
+## Generic Types
+Generics in Rust allow you to write code that can operate on different types without sacrificing type safety. You can define functions, structs, enums, and traits that can work with any type by using type parameters. This enables code reuse and flexibility while maintaining the benefits of Rust's strong type system.
+
+```rust
+fn print_value<T: std::fmt::Display>(value: T) {
+    println!("Value: {}", value);
+}
+print_value(42); // Prints "Value: 42"
+print_value("Hello, Rust!"); // Prints "Value: Hello, Rust!"
+struct Pair<T, U> {
+    first: T,
+    second: U,
+}
+let pair = Pair { first: 1, second: "Rust" };
+println!("Pair: ({}, {})", pair.first, pair.second); // Prints "Pair: (1, Rust)"
+```
+
+## Macros
+Macros in Rust are a powerful way to write code that generates other code at compile time. They allow you to define reusable patterns and can be used to reduce boilerplate code. Macros are defined using the `macro_rules!` syntax and can take arguments to customize their behavior.
+```rust
+macro_rules! say_hello {
+    () => {
+        println!("Hello, world!");
+    };
+}
+say_hello!(); // Prints "Hello, world!"
+macro_rules! create_function {
+    ($func_name:ident) => {
+        fn $func_name() {
+            println!("Function {} called", stringify!($func_name));
+        }
+    };
+}
+create_function!(my_function);
+my_function(); // Prints "Function my_function called"
+```
+
+Macros can be used to create more complex code generation patterns, such as implementing traits for multiple types or generating boilerplate code for data structures.
+```rust
+macro_rules! impl_trait {
+    ($trait_name:ident, $type_name:ident) => {
+        impl $trait_name for $type_name {
+            fn method(&self) {
+                println!("Method called on {}", stringify!($type_name));
+            }
+        }
+    };
+}
+trait MyTrait {
+    fn method(&self);
+}
+struct MyType;
+impl_trait!(MyTrait, MyType);
+let my_instance = MyType;
+my_instance.method(); // Prints "Method called on MyType"
+```
